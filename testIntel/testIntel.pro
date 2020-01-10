@@ -11,7 +11,7 @@ QT += core
 
 HEADERS += \
         openclsamplecode.h \
-        tst_case1.h
+        testSampleCode.h
 
 SOURCES += \
         main.cpp \

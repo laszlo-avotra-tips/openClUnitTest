@@ -1,8 +1,11 @@
 #include "openclsamplecode.h"
+#include <QDebug>
 
 OpenClSampleCode::OpenClSampleCode()
 {
-
+    init();
+    createContext();
+//    qDebug() << getCode();
 }
 
 const QString& OpenClSampleCode::getCode() const{
