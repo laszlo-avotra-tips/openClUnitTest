@@ -11,10 +11,12 @@ QT += core
 
 HEADERS += \
         openclsamplecode.h \
-        testSampleCode.h
+        testSampleCode.h \
+        testvector.h
 
 SOURCES += \
         main.cpp \
-        openclsamplecode.cpp
+        openclsamplecode.cpp \
+        testvector.cpp
 
 DISTFILES +=
