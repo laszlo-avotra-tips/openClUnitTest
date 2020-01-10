@@ -20,3 +20,6 @@ SOURCES += \
         testvector.cpp
 
 DISTFILES +=
+
+RESOURCES += \
+    openClCode.qrc

@@ -1,8 +1,9 @@
 #include "testvector.h"
 #include <QDebug>
+#include <QFile>
+#include <QTextStream>
 
-TestVector::TestVector() :
-    code{"__kernel void vector_add(__global const int *A, __global const int *B, __global int *C) {int i = get_global_id(0);C[i] = A[i] + B[i];}"}
+TestVector::TestVector()
 {
     A = new int[LIST_SIZE];
     B = new int[LIST_SIZE];
@@ -13,6 +14,15 @@ TestVector::TestVector() :
         B[i] = int(LIST_SIZE - i);
         C[i] = 0;
     }
+
+    QFile codeFile(":/openCl/sampleCode");
+    codeFile.open(QIODevice::ReadOnly);
+    QTextStream qts(&codeFile);
+
+//    qDebug() << qts.readAll();
+    m_theCode = qts.readAll().toStdString();
+    code = m_theCode.c_str();
+
 }
 
 TestVector::~TestVector()

@@ -1,6 +1,7 @@
 #ifndef TESTVECTOR_H
 #define TESTVECTOR_H
 
+#include <string>
 
 class TestVector
 {
@@ -16,6 +17,9 @@ static const size_t LIST_SIZE{1024};
 
     void print(void) const;
     bool testResultOfOPenClVectorAdd() const;
+
+private:
+    std::string m_theCode;
 };
 
 #endif // TESTVECTOR_H

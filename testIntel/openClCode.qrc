@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/openCl">
+        <file alias="sampleCode">vector_add_kernel.cl</file>
+    </qresource>
+</RCC>
