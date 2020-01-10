@@ -9,7 +9,9 @@ class TestVector;
 class OpenClSampleCode
 {
 public:
-    OpenClSampleCode();
+    OpenClSampleCode(const TestVector& testCase);
+    ~OpenClSampleCode();
+
     const QString& getCode() const;
     uint getNumDevices() const;
     uint getNumPlatforms() const;
@@ -17,11 +19,11 @@ public:
     bool isContext() const;
     bool isCommandQueue() const;
     bool isMemoryCreated() const;
-    bool initailizeData(const TestVector& data);
+    bool initailizeOpenClDataBuffers();
     bool buildOpenClKernel();
     bool setKernelArguments();
     bool executeTheKernelFunction();
-    bool collectResult(TestVector& data);
+    bool collectResult();
 
 private:
     void init();
@@ -32,6 +34,7 @@ private:
     bool createClMemoryObjects();
 
 private:
+    const TestVector& m_testCase;
     cl_context context{nullptr};
     cl_command_queue command_queue{nullptr};
     cl_platform_id platform_id = nullptr;
@@ -45,6 +48,7 @@ private:
     cl_mem c_mem_obj{nullptr};
     bool m_isMemoryCreated{false};
 
+    cl_program program{nullptr};
     cl_kernel kernel{nullptr};
     size_t global_item_size{0};
     size_t local_item_size{64};

@@ -3,12 +3,29 @@
 
 #include <QDebug>
 
-OpenClSampleCode::OpenClSampleCode() : m_code{"__kernel void vector_add(__global const int *A, __global const int *B, __global int *C) {int i = get_global_id(0);C[i] = A[i] + B[i];}"}
+OpenClSampleCode::OpenClSampleCode(const TestVector& testCase) : m_testCase(testCase),
+    m_code{m_testCase.code}
 {
     init();
     createContext();
     createCommandQueue();
     createClMemoryObjects();
+}
+
+OpenClSampleCode::~OpenClSampleCode()
+{
+    cl_int ret{0};
+
+    // Clean up
+    ret = clFlush(command_queue);
+    ret = clFinish(command_queue);
+    ret = clReleaseKernel(kernel);
+    ret = clReleaseProgram(program);
+    ret = clReleaseMemObject(a_mem_obj);
+    ret = clReleaseMemObject(b_mem_obj);
+    ret = clReleaseMemObject(c_mem_obj);
+    ret = clReleaseCommandQueue(command_queue);
+    ret = clReleaseContext(context);
 }
 
 const QString& OpenClSampleCode::getCode() const{
@@ -42,18 +59,18 @@ bool OpenClSampleCode::isMemoryCreated() const
     return m_isMemoryCreated;
 }
 
-bool OpenClSampleCode::initailizeData(const TestVector &data)
+bool OpenClSampleCode::initailizeOpenClDataBuffers()
 {
     bool success{true};
     cl_int ret{0};
 
     // Copy the lists A and B to their respective memory buffers
     ret = clEnqueueWriteBuffer(command_queue, a_mem_obj, CL_TRUE, 0,
-            TestVector::LIST_SIZE * sizeof(int), data.A, 0, nullptr, nullptr);
+            TestVector::LIST_SIZE * sizeof(int), m_testCase.A, 0, nullptr, nullptr);
     success = success && !ret;
 
     ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0,
-            TestVector::LIST_SIZE * sizeof(int), data.B, 0, nullptr, nullptr);
+            TestVector::LIST_SIZE * sizeof(int), m_testCase.B, 0, nullptr, nullptr);
     success = success && !ret;
 
     return success;
@@ -73,7 +90,7 @@ bool OpenClSampleCode::buildOpenClKernel()
 
     const size_t source_size = size_t(getCode().size());
 
-    cl_program program = clCreateProgramWithSource(context, 1,
+    program = clCreateProgramWithSource(context, 1,
                                                    &src, &source_size, &ret);
     success = success && !ret;
 
@@ -115,10 +132,10 @@ bool OpenClSampleCode::executeTheKernelFunction()
     return success;
 }
 
-bool OpenClSampleCode::collectResult(TestVector &data)
+bool OpenClSampleCode::collectResult()
 {
     cl_int ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
-            data.LIST_SIZE * sizeof(int), data.C, 0, nullptr, nullptr);
+            TestVector::LIST_SIZE * sizeof(int), m_testCase.C, 0, nullptr, nullptr);
     return ret == CL_SUCCESS;
 }
 
@@ -145,7 +162,7 @@ cl_int OpenClSampleCode::createCommandQueue()
 cl_int OpenClSampleCode::initPlatformIds(){
 
     cl_int err = clGetPlatformIDs(1,&platform_id, &ret_num_platforms);
-    qDebug() << ret_num_platforms;
+//    qDebug() << ret_num_platforms;
 
     const int DefaultStringSize = 128;
     char vendor[ DefaultStringSize ];
@@ -156,7 +173,7 @@ cl_int OpenClSampleCode::initPlatformIds(){
     err |= clGetPlatformInfo( platform_id, CL_PLATFORM_NAME,    DefaultStringSize, name,    nullptr );
     err |= clGetPlatformInfo( platform_id, CL_PLATFORM_VERSION, DefaultStringSize, version, nullptr );
 
-    qDebug() << "vendor " << vendor << ", name " << name << ", version " << version;
+    qDebug() << "[----------] vendor " << vendor << ", name " << name << ", version " << version;
 
     return err;
 }

@@ -7,11 +7,6 @@
 #include <openclsamplecode.h>
 #include <testvector.h>
 
-QString getReferenceCode();
-QString getReferenceCode(){
-const QString code{R"(__kernel void vector_add(__global const int *A, __global const int *B, __global int *C) {int i = get_global_id(0);C[i] = A[i] + B[i];})"};
-return code;
-}
 
 using namespace testing;
 
@@ -39,29 +34,25 @@ TEST(vector, case1)
 
 TEST(sampleCode, case2)
 {
-    OpenClSampleCode ut;
+    TestVector v;
+    OpenClSampleCode ut(v);
 
     EXPECT_EQ(1, ut.getNumDevices());
     EXPECT_EQ(2,ut.getNumPlatforms());
-    EXPECT_EQ(getReferenceCode(), ut.getCode());
+    EXPECT_EQ(QString(v.code), ut.getCode());
 
     EXPECT_TRUE(ut.isDeviceId());
     EXPECT_TRUE(ut.isContext());
     EXPECT_TRUE(ut.isCommandQueue());
     EXPECT_TRUE(ut.isMemoryCreated());
 
-    TestVector v;
 
-    EXPECT_TRUE(ut.initailizeData(v));
+    EXPECT_TRUE(ut.initailizeOpenClDataBuffers());
     EXPECT_TRUE(ut.buildOpenClKernel());
-
     EXPECT_TRUE(ut.setKernelArguments());
-
     EXPECT_TRUE(ut.executeTheKernelFunction());
-
-    EXPECT_TRUE(ut.collectResult(v));
-
-    v.print();
+    EXPECT_TRUE(ut.collectResult());
+    EXPECT_TRUE(v.testResultOfOPenClVectorAdd());
 }
 
 
