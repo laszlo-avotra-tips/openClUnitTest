@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2020-01-10T00:38:41. -->
+<!-- Written by QtCreator 4.11.0, 2020-01-10T22:36:18. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -116,6 +116,7 @@
     <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
      <value type="QString">GOOGLETEST_DIR=C:/Users/laszlo/Documents/test/googleTest/googletest-master</value>
+     <value type="QString">STATIC_LIB_DIR=C:/Users/laszlo/source/repos/cudaAccel</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Debug</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>

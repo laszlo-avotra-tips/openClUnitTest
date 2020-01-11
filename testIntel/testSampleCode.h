@@ -6,6 +6,7 @@
 #include <CL/cl.h>
 #include <openclsamplecode.h>
 #include <testvector.h>
+#include <cudaAccel/framework.h>
 
 
 using namespace testing;
@@ -53,6 +54,17 @@ TEST(sampleCode, case2)
     EXPECT_TRUE(ut.executeTheKernelFunction());
     EXPECT_TRUE(ut.collectResult());
     EXPECT_TRUE(v.testResultOfOPenClVectorAdd());
+}
+
+TEST(cudaAccelLib, case1)
+{
+    int a{7};
+    int b{8};
+    int c{0};
+
+    addVector(&a, &b, &c);
+
+    EXPECT_EQ(15,c);
 }
 
 
