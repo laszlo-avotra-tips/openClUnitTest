@@ -21,7 +21,7 @@ TEST(unitTest, case1)
     ASSERT_THAT(0, Eq(0));
 }
 
-TEST(vector, case1)
+TEST(testvector, case1)
 {
     TestVector v;
 
@@ -69,17 +69,34 @@ TEST(cudaAccelLib, case1)
     EXPECT_EQ(15,c);
 }
 
+TEST(vector, data) {
+    std::vector<float> ut{1,2,3};
+    const float* utReadOnly = ut.data();
+    EXPECT_EQ(2,utReadOnly[1]);
+    float* utRW = ut.data();
+    utRW[1] = 12345;
+    EXPECT_EQ(12345,utReadOnly[1]);
+}
+
 TEST(cudaWrapper, case1)
 {
     const size_t size{5};
-    int a[5] = {1,2,3,4,5};
-    int b[5] = {11,22,33,44,55};
+    const int a[5] = {1,2,3,4,5};
+    const int b[5] = {11,22,33,44,55};
     int c[5]{};
 
     EXPECT_TRUE(addTwoVectors(c, a, b, size));
     qDebug() << c[0] << ", " << c[1] << ", "<< c[2] << ", "<< c[3] << ", "<< c[4];
 }
 
+TEST(cudaWrapper, case2)
+{
+    TestVector v;
+
+    EXPECT_TRUE(addTwoVectors(v.C, v.A, v.B, v.LIST_SIZE));
+
+    EXPECT_TRUE(v.testResultOfOPenClVectorAdd());
+}
 
 
 #endif // TESTSAMPLECODE_H
