@@ -7,6 +7,8 @@
 #include <openclsamplecode.h>
 #include <testvector.h>
 #include <cudaAccel/framework.h>
+#include <cudaWrapperL300.h>
+#include <QDebug>
 
 
 using namespace testing;
@@ -65,6 +67,17 @@ TEST(cudaAccelLib, case1)
     addVector(&a, &b, &c);
 
     EXPECT_EQ(15,c);
+}
+
+TEST(cudaWrapper, case1)
+{
+    const size_t size{5};
+    int a[5] = {1,2,3,4,5};
+    int b[5] = {11,22,33,44,55};
+    int c[5]{};
+
+    EXPECT_TRUE(addTwoVectors(c, a, b, size));
+    qDebug() << c[0] << ", " << c[1] << ", "<< c[2] << ", "<< c[3] << ", "<< c[4];
 }
 
 
