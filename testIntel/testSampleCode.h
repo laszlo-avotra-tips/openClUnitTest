@@ -9,6 +9,7 @@
 #include <cudaAccel/framework.h>
 #include <cudaWrapperL300.h>
 #include <QDebug>
+#include <QTime>
 
 
 using namespace testing;
@@ -40,6 +41,9 @@ TEST(sampleCode, case2)
     TestVector v;
     OpenClSampleCode ut(v);
 
+    QTime t1;
+    t1.start();
+
     EXPECT_EQ(1, ut.getNumDevices());
     EXPECT_EQ(2,ut.getNumPlatforms());
     EXPECT_EQ(QString(v.code), ut.getCode());
@@ -54,7 +58,43 @@ TEST(sampleCode, case2)
     EXPECT_TRUE(ut.buildOpenClKernel());
     EXPECT_TRUE(ut.setKernelArguments());
     EXPECT_TRUE(ut.executeTheKernelFunction());
-    EXPECT_TRUE(ut.collectResult());
+    const bool isResultSuccess{ut.collectResult()};
+    qDebug() << "[..........] " << t1.elapsed() << " ms elapsed in openCl";
+
+    EXPECT_TRUE(isResultSuccess);
+
+    EXPECT_TRUE(v.testResultOfOPenClVectorAdd());
+
+}
+
+TEST(cudaWrapper, case1)
+{
+    const size_t size{5};
+    const int a[5] = {1,2,3,4,5};
+    const int b[5] = {11,22,33,44,55};
+    int c[5]{};
+
+    QTime t1;
+    t1.start();
+    const bool isResultSuccess{addTwoVectors(c, a, b, size)};
+    qDebug() << "[..........] " << t1.elapsed() << " ms elapsed in CUDA case1";
+
+    EXPECT_TRUE(isResultSuccess);
+
+    qDebug() << "[----------] " << c[0] << ", " << c[1] << ", "<< c[2] << ", "<< c[3] << ", "<< c[4];
+}
+
+TEST(cudaWrapper, case2)
+{
+    TestVector v;
+
+    QTime t1;
+
+    t1.start();
+    const bool isResultSuccess{addTwoVectors(v.C, v.A, v.B, v.LIST_SIZE)};
+    qDebug() << "[..........] " << t1.elapsed() << " ms elapsed in CUDA case 2";
+
+    EXPECT_TRUE(isResultSuccess);
     EXPECT_TRUE(v.testResultOfOPenClVectorAdd());
 }
 
@@ -77,26 +117,5 @@ TEST(vector, data) {
     utRW[1] = 12345;
     EXPECT_EQ(12345,utReadOnly[1]);
 }
-
-TEST(cudaWrapper, case1)
-{
-    const size_t size{5};
-    const int a[5] = {1,2,3,4,5};
-    const int b[5] = {11,22,33,44,55};
-    int c[5]{};
-
-    EXPECT_TRUE(addTwoVectors(c, a, b, size));
-    qDebug() << c[0] << ", " << c[1] << ", "<< c[2] << ", "<< c[3] << ", "<< c[4];
-}
-
-TEST(cudaWrapper, case2)
-{
-    TestVector v;
-
-    EXPECT_TRUE(addTwoVectors(v.C, v.A, v.B, v.LIST_SIZE));
-
-    EXPECT_TRUE(v.testResultOfOPenClVectorAdd());
-}
-
 
 #endif // TESTSAMPLECODE_H
