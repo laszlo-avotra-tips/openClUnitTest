@@ -1,4 +1,6 @@
-#include "testSampleCode.h"
+#include "testEnvironment.h"
+#include "testOpenCl.h"
+#include "testCuda.h"
 
 #include <gtest/gtest.h>
 

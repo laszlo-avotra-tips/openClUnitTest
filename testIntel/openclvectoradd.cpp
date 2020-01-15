@@ -1,9 +1,9 @@
-#include "openclsamplecode.h"
+#include "openclvectoradd.h"
 #include <testvector.h>
 
 #include <QDebug>
 
-OpenClSampleCode::OpenClSampleCode(const TestVector& testCase) : m_testCase(testCase),
+OpenClVectorAdd::OpenClVectorAdd(const TestVector& testCase) : m_testCase(testCase),
     m_code{m_testCase.code}
 {
     init();
@@ -12,7 +12,7 @@ OpenClSampleCode::OpenClSampleCode(const TestVector& testCase) : m_testCase(test
     createClMemoryObjects();
 }
 
-OpenClSampleCode::~OpenClSampleCode()
+OpenClVectorAdd::~OpenClVectorAdd()
 {
     cl_int ret{0};
 
@@ -28,38 +28,38 @@ OpenClSampleCode::~OpenClSampleCode()
     ret = clReleaseContext(context);
 }
 
-const QString& OpenClSampleCode::getCode() const{
+const QString& OpenClVectorAdd::getCode() const{
     return m_code;
 }
 
-uint OpenClSampleCode::getNumDevices() const{
+uint OpenClVectorAdd::getNumDevices() const{
     return ret_num_devices;
 }
-uint OpenClSampleCode::getNumPlatforms() const{
+uint OpenClVectorAdd::getNumPlatforms() const{
     return ret_num_platforms;
 }
 
-bool OpenClSampleCode::isDeviceId() const
+bool OpenClVectorAdd::isDeviceId() const
 {
     return device_id;
 }
 
-bool OpenClSampleCode::isContext() const
+bool OpenClVectorAdd::isContext() const
 {
     return context;
 }
 
-bool OpenClSampleCode::isCommandQueue() const
+bool OpenClVectorAdd::isCommandQueue() const
 {
     return command_queue;
 }
 
-bool OpenClSampleCode::isMemoryCreated() const
+bool OpenClVectorAdd::isMemoryCreated() const
 {
     return m_isMemoryCreated;
 }
 
-bool OpenClSampleCode::initailizeOpenClDataBuffers()
+bool OpenClVectorAdd::initailizeOpenClDataBuffers()
 {
     bool success{true};
     cl_int ret{0};
@@ -76,7 +76,7 @@ bool OpenClSampleCode::initailizeOpenClDataBuffers()
     return success;
 }
 
-bool OpenClSampleCode::buildOpenClKernel()
+bool OpenClVectorAdd::buildOpenClKernel()
 {
     bool success{true};
     cl_int ret{0};
@@ -104,7 +104,7 @@ bool OpenClSampleCode::buildOpenClKernel()
     return success;
 }
 
-bool OpenClSampleCode::setKernelArguments()
+bool OpenClVectorAdd::setKernelArguments()
 {
     bool success{true};
     cl_int ret(0);
@@ -123,7 +123,7 @@ bool OpenClSampleCode::setKernelArguments()
     return success;
 }
 
-bool OpenClSampleCode::executeTheKernelFunction()
+bool OpenClVectorAdd::executeTheKernelFunction()
 {
     cl_int ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, nullptr,
             &global_item_size, &local_item_size, 0, nullptr, nullptr);
@@ -132,24 +132,24 @@ bool OpenClSampleCode::executeTheKernelFunction()
     return success;
 }
 
-bool OpenClSampleCode::collectResult()
+bool OpenClVectorAdd::collectResult()
 {
     cl_int ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
             TestVector::LIST_SIZE * sizeof(int), m_testCase.C, 0, nullptr, nullptr);
     return ret == CL_SUCCESS;
 }
 
-void OpenClSampleCode::init(){
+void OpenClVectorAdd::init(){
     initPlatformIds();
     initDeviceIds();
 }
-cl_int OpenClSampleCode::createContext(){
+cl_int OpenClVectorAdd::createContext(){
     cl_int ret{0};
     context = clCreateContext(nullptr,1,&device_id,nullptr,nullptr,&ret);
     return ret;
 }
 
-cl_int OpenClSampleCode::createCommandQueue()
+cl_int OpenClVectorAdd::createCommandQueue()
 {
     cl_int ret{0};
 //    command_queue = clCreateCommandQueue(context, device_id, 0, &ret); //lcv deprecated
@@ -159,7 +159,7 @@ cl_int OpenClSampleCode::createCommandQueue()
     return ret;
 }
 
-cl_int OpenClSampleCode::initPlatformIds(){
+cl_int OpenClVectorAdd::initPlatformIds(){
 
     cl_int err = clGetPlatformIDs(1,&platform_id, &ret_num_platforms);
 //    qDebug() << ret_num_platforms;
@@ -177,14 +177,14 @@ cl_int OpenClSampleCode::initPlatformIds(){
 
     return err;
 }
-cl_int OpenClSampleCode::initDeviceIds(){
+cl_int OpenClVectorAdd::initDeviceIds(){
     cl_int ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_DEFAULT, 1,
                                  &device_id, &ret_num_devices);
 //        qDebug() << ret_num_devices;
     return ret;
 }
 
-bool OpenClSampleCode::createClMemoryObjects()
+bool OpenClVectorAdd::createClMemoryObjects()
 {
     bool success{true};
     cl_int ret(0);

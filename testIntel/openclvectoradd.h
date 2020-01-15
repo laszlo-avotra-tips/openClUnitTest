@@ -1,16 +1,16 @@
-#ifndef OPENCLSAMPLECODE_H
-#define OPENCLSAMPLECODE_H
+#ifndef OPENCLVECTORADD_H
+#define OPENCLVECTORADD_H
 
 #include <QString>
 #include <CL/cl.h>
 
 class TestVector;
 
-class OpenClSampleCode
+class OpenClVectorAdd
 {
 public:
-    OpenClSampleCode(const TestVector& testCase);
-    ~OpenClSampleCode();
+    OpenClVectorAdd(const TestVector& testCase);
+    ~OpenClVectorAdd();
 
     const QString& getCode() const;
     uint getNumDevices() const;
@@ -55,4 +55,4 @@ private:
 };
 
 
-#endif // OPENCLSAMPLECODE_H
+#endif // OPENCLVECTORADD_H

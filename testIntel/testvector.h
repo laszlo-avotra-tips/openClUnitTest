@@ -16,7 +16,7 @@ static const size_t LIST_SIZE{1024};
     ~TestVector();
 
     void print(void) const;
-    bool testResultOfOPenClVectorAdd() const;
+    bool testResultOfVectorAdd() const;
 
 private:
     std::string m_theCode;

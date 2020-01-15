@@ -40,7 +40,7 @@ void TestVector::print() const
     }
 }
 
-bool TestVector::testResultOfOPenClVectorAdd() const
+bool TestVector::testResultOfVectorAdd() const
 {
     bool success{true};
 
