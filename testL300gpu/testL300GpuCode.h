@@ -6,6 +6,7 @@
 #include <cudaWrapperL300.h>
 #include <CL/cl.h>
 #include <vectoraddtestvector.h>
+#include <rescalekernel.h>
 #include <QDebug>
 #include <QTime>
 
@@ -72,6 +73,43 @@ TEST(vector, data) {
     float* utRW = ut.data();
     utRW[1] = 12345;
     EXPECT_EQ(12345,utReadOnly[1]);
+}
+
+TEST(rescale, theKernelFunction)
+{
+    const unsigned short input[8]{1,2,3,4,5,6,7,8};
+    float output[5]{};
+    const float fractionalSamples[4]{1,2,3,4};
+    const float wholeSamples[4]{1,2,3,4};
+    const float window[4]{1,2,3,4};
+    const unsigned int inputLength{1};
+    const unsigned int outputLength{1};
+
+    EXPECT_EQ(0,output[2]);
+
+    RescaleKernel::theFunction( input, output,
+                                fractionalSamples,
+                                wholeSamples,
+                                window,
+                                inputLength,
+                                outputLength);
+    EXPECT_EQ(12,output[2]);
+}
+
+TEST(L300, rescale)
+{
+    char buffer[80]{};
+    char* errorMsg{buffer};
+
+    bool success = cudaRescale(nullptr,0,nullptr,nullptr,errorMsg);
+    EXPECT_FALSE(success);
+    if(!success){
+        EXPECT_STREQ("Invalid arguments",errorMsg);
+    }
+
+    unsigned short data[8]{1,2,3,4,5,6,7,8};
+    EXPECT_TRUE(cudaRescale(data,16,nullptr,nullptr,errorMsg));
+    EXPECT_EQ(0,buffer[0]);
 }
 
 #endif // TESTSAMPLECODE_H

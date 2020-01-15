@@ -11,11 +11,13 @@ CONFIG += thread
 QT += core
 
 HEADERS += \
+    rescalekernel.h \
     testL300GpuCode.h \
     vectoraddtestvector.h
 
 SOURCES += \
         main.cpp \
+        rescalekernel.cpp \
         vectoraddtestvector.cpp
 
 DISTFILES +=
