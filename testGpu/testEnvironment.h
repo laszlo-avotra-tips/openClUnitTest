@@ -11,12 +11,43 @@
 
 using namespace testing;
 
+#define ADD_COLUMN_COUNT 3
+
+void add(int c[][ADD_COLUMN_COUNT], const int a[][ADD_COLUMN_COUNT], const int b[][ADD_COLUMN_COUNT], const size_t N=ADD_COLUMN_COUNT);
+
+void add(int c[][ADD_COLUMN_COUNT], const int a[][ADD_COLUMN_COUNT], const int b[][ADD_COLUMN_COUNT], const size_t N){
+    for(size_t i = 0; i < N; ++i){
+        for(size_t j = 0; j < N; ++j){
+            c[i][j] = a[i][j] + b[i][j];
+        }
+    }
+}
+
+
 TEST(unitTest, libraries)
 {
     const int one{1};
 
     EXPECT_EQ(one, 1);
     ASSERT_THAT(0, Eq(0));
+}
+
+TEST(c,array)
+{
+    int a[3][3] = {{11,12,13},{21,22,23},{31,32,33}};
+    int b[3][3] = {{111,112,113},{121,122,123},{131,132,133}};
+    int c[3][3] = {};
+
+    ASSERT_EQ(a[0][0],11);
+    ASSERT_EQ(a[1][2],23);
+    ASSERT_EQ(a[2][2],33);
+
+    ASSERT_EQ(c[0][0],0);
+
+    add(c,a,b,3);
+
+    ASSERT_EQ(c[0][0],122);
+
 }
 
 TEST(testVector, vectorAdd)
