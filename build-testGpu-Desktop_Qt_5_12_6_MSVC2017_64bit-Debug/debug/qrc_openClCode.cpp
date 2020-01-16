@@ -7,7 +7,7 @@
 *****************************************************************************/
 
 static const unsigned char qt_resource_data[] = {
-  // C:/Users/laszlo/Documents/GitHub/openClUnitTest/testIntel/vector_add_kernel.cl
+  // C:/Users/laszlo/Documents/GitHub/openClUnitTest/testGpu/vector_add_kernel.cl
   0x0,0x0,0x0,0xf0,
   0x5f,
   0x5f,0x6b,0x65,0x72,0x6e,0x65,0x6c,0x20,0x76,0x6f,0x69,0x64,0x20,0x76,0x65,0x63,
