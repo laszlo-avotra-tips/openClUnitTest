@@ -10,7 +10,6 @@ public:
                      float *output,
                      const float *fractionalSamples,
                      const float *wholeSamples,
-                     const float *window,
                      const unsigned int inputLength,
                      const unsigned int outputLength);
 };

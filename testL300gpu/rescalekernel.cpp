@@ -9,7 +9,6 @@ void RescaleKernel::theFunction(const unsigned short *input,
                                 float *output,
                                 const float *fractionalSamples,
                                 const float *wholeSamples,
-                                const float *window,
                                 const unsigned int inputLength,
                                 const unsigned int outputLength)
 {
@@ -32,5 +31,5 @@ void RescaleKernel::theFunction(const unsigned short *input,
     interpSample = interpSample + input[input_pos];
 
     // Apply the passed in window function and set the output
-    output[i + write_offset] = interpSample * window[i];
+    output[i + write_offset] = interpSample;
 }

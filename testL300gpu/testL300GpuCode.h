@@ -81,7 +81,6 @@ TEST(rescale, theKernelFunction)
     float output[5]{};
     const float fractionalSamples[4]{1,2,3,4};
     const float wholeSamples[4]{1,2,3,4};
-    const float window[4]{1,2,3,4};
     const unsigned int inputLength{1};
     const unsigned int outputLength{1};
 
@@ -90,26 +89,65 @@ TEST(rescale, theKernelFunction)
     RescaleKernel::theFunction( input, output,
                                 fractionalSamples,
                                 wholeSamples,
-                                window,
                                 inputLength,
                                 outputLength);
-    EXPECT_EQ(12,output[2]);
+    EXPECT_EQ(6,output[2]);
 }
 
-TEST(L300, rescale)
+TEST(cudRescale, parameters)
 {
     char buffer[80]{};
     char* errorMsg{buffer};
+    unsigned short data[8]{1,2,3,4,5,6,7,8};
+    float wholeSample[2]{};
+    float output[8]{};
 
-    bool success = cudaRescale(nullptr,0,nullptr,nullptr,errorMsg);
+    bool success = cudaRescale(output,nullptr,0,nullptr,nullptr,errorMsg);
     EXPECT_FALSE(success);
     if(!success){
         EXPECT_STREQ("Invalid arguments",errorMsg);
     }
 
-    unsigned short data[8]{1,2,3,4,5,6,7,8};
-    EXPECT_TRUE(cudaRescale(data,16,nullptr,nullptr,errorMsg));
-    EXPECT_EQ(0,buffer[0]);
+    success = cudaRescale(output,data,8,nullptr,nullptr,errorMsg);
+    EXPECT_FALSE(success);
+    if(!success){
+        EXPECT_STREQ("Invalid arguments",errorMsg);
+    }
+
+    success = cudaRescale(output,data,8,wholeSample,nullptr,errorMsg);
+    EXPECT_FALSE(success);
+    if(!success){
+        EXPECT_STREQ("Invalid arguments",errorMsg);
+    }
+    success = cudaRescale(output,data,8,nullptr,wholeSample,errorMsg);
+    EXPECT_FALSE(success);
+    if(!success){
+        EXPECT_STREQ("Invalid arguments",errorMsg);
+    }
+}
+
+TEST(cudaRescale, memoryAllocation)
+{
+    char buffer[80]{};
+    char* errorMsg{buffer};
+
+//    const size_t sizeOfData{5758976/2};
+//    const size_t sizeOfTable{2048};
+    const size_t sizeOfData{1024};
+    const size_t sizeOfTable{1024};
+
+    unsigned short data[sizeOfData]{1};
+    float fracSamples[sizeOfTable]{1};
+    float wholeSamples[sizeOfTable]{1};
+    float output[sizeOfData]{};
+
+    bool success = cudaRescale(output,data,sizeOfData,wholeSamples,fracSamples,errorMsg);
+    EXPECT_TRUE(success);
+    if(success){
+        EXPECT_EQ(0,buffer[0]);
+    } else {
+        qDebug() << "{!!!!!!!!!!] " << QString(errorMsg);
+    }
 }
 
 #endif // TESTSAMPLECODE_H
