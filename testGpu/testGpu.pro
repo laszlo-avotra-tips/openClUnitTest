@@ -1,6 +1,6 @@
 include(gtest_dependency.pri)
 include(openCl_dependency.pri)
-include(staticLib_dependency.pri)
+#include(staticLib_dependency.pri)
 include(cuda_dependency.pri)
 
 

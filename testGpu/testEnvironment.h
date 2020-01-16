@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock-matchers.h>
 #include <testvector.h>
-#include <cudaAccel/framework.h>
+//#include <cudaAccel/framework.h>
 #include <QDebug>
 #include <QTime>
 
@@ -64,16 +64,16 @@ TEST(testVector, vectorAdd)
 
 }
 
-TEST(cudaAccelLib, library)
-{
-    int a{7};
-    int b{8};
-    int c{0};
+//TEST(cudaAccelLib, library)
+//{
+//    int a{7};
+//    int b{8};
+//    int c{0};
 
-    addVector(&a, &b, &c);
+//    addVector(&a, &b, &c);
 
-    EXPECT_EQ(15,c);
-}
+//    EXPECT_EQ(15,c);
+//}
 
 TEST(vector, dataFunction) {
     std::vector<float> ut{1,2,3};
