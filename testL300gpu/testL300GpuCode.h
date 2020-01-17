@@ -126,6 +126,39 @@ TEST(cudRescale, parameters)
     }
 }
 
+TEST(cuda, matrix4by4Add)
+{
+    int A[4][4];
+    int B[4][4];
+    int C[4][4]{};
+    int result[4][4];
+
+    for(int i=0; i<4; ++i){
+        for(int j=0; j<4; ++j){
+           result[i][j] = 10*(i+1) + 100*(j+1);
+           A[i][j] = (i+1)*(j+1) + i;
+           B[i][j] = result[i][j] - A[i][j];
+        }
+    }
+
+    ASSERT_EQ(C[2][3],0);
+
+    matrix4by4Add(C,A,B);
+
+    ASSERT_EQ(result[2][3], C[2][3]);
+
+    for(int i=0; i<4; ++i){
+        for(int j=0; j<4; ++j){
+//           qDebug() << "[" << i << "," << j << "] R=" << result[i][j] <<
+//           ", A=" << A[i][j] <<
+//           ", B=" << B[i][j] <<
+//           ", C=" << C[i][j];
+            ASSERT_EQ(result[i][j], C[i][j]);
+        }
+    }
+
+}
+
 TEST(cudaRescale, memoryAllocation)
 {
     char buffer[80]{};
