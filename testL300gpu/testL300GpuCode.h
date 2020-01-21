@@ -16,7 +16,7 @@ using Complex = std::complex<float>;
 void addjustCoefficientMagnitude(Complex* h_data, long dataSize) noexcept;
 int isOriginalEqualToTheTransformedAndInverseTransformenData(
     const Complex* original, const Complex* transformed, long dataSize) noexcept;
-void printTheData(const Complex* original, const Complex* transformed, long dataSize);
+void printTheData(const Complex* original, const Complex* transformed, long dataSize, const int printOffset);
 void initializeTheSignals(Complex* fft, Complex* invfft, long dataSize) noexcept;
 
 void addjustCoefficientMagnitude(Complex* h_data, long dataSize) noexcept
@@ -43,18 +43,18 @@ int isOriginalEqualToTheTransformedAndInverseTransformenData(
     return iTestResult;
 }
 
-void printTheData(const Complex* original, const Complex* transformed, long dataSize)
+void printTheData(const Complex* original, const Complex* transformed, long dataSize, const int printOffset)
 {
-    std::cout << "The first " << dataSize << " real values:" << std::endl;
+    std::cout << "The first " << dataSize << " real values with offset [" << printOffset << "] :" << std::endl;
     if (original) {
         for (int i = 0; i < dataSize; ++i) {
-            std::cout << original[i].real() << " ";
+            std::cout << original[i + printOffset].real() << " ";
         }
         std::cout << std::endl;
     }
     if (transformed) {
         for (int i = 0; i < dataSize; ++i) {
-            std::cout << transformed[i].real() << " ";
+            std::cout << transformed[i + printOffset].real() << " ";
         }
         std::cout << std::endl;
     }
@@ -62,11 +62,13 @@ void printTheData(const Complex* original, const Complex* transformed, long data
 
 void initializeTheSignals(Complex* fft, Complex* invfft, long dataSize) noexcept
 {
-    for (long i = 0; i < dataSize; ++i) {
-        if(fft)
+      for (long i = 0; i < dataSize; ++i) {
+        if(fft){
             fft[i] = { rand() / static_cast<float>(RAND_MAX), 0 };
-        if(invfft)
-            invfft[i] = { float(i), 1000.f * i };
+        }
+        if(invfft){
+            invfft[i] = { 0.1f };
+        }
     }
 }
 
@@ -171,6 +173,7 @@ TEST(cuda, matrix4by4Add)
 TEST(cudaFFT, computeTheFFT)
 {
     constexpr long SIGNAL_SIZE(1024);
+    constexpr int batch{4};
 
     // Allocate host memory for the signal
     auto h_signal = std::make_unique<std::complex<float>[]>(SIGNAL_SIZE);
@@ -178,7 +181,8 @@ TEST(cudaFFT, computeTheFFT)
 
     initializeTheSignals(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE);
 
-    ComputeTheFFT(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE);
+
+    ComputeTheFFT(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE, batch);
 
     // check result
     int iTestResult = 1;
@@ -188,7 +192,7 @@ TEST(cudaFFT, computeTheFFT)
 
     iTestResult = isOriginalEqualToTheTransformedAndInverseTransformenData(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE);
 
-    printTheData(h_signal.get(), h_signal_fft_ifft.get(), 10);
+    printTheData(h_signal.get(), h_signal_fft_ifft.get(), 8, 0);
 
     EXPECT_EQ(0, iTestResult);
 }
