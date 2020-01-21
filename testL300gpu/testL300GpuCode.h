@@ -6,10 +6,69 @@
 #include <cudaWrapperL300.h>
 #include <CL/cl.h>
 #include <vectoraddtestvector.h>
-#include <rescalekernel.h>
 #include <QDebug>
 #include <QTime>
+#include <cudaFFTwrapper.h>
+#include <complex>
 
+
+using Complex = std::complex<float>;
+void addjustCoefficientMagnitude(Complex* h_data, long dataSize) noexcept;
+int isOriginalEqualToTheTransformedAndInverseTransformenData(
+    const Complex* original, const Complex* transformed, long dataSize) noexcept;
+void printTheData(const Complex* original, const Complex* transformed, long dataSize);
+void initializeTheSignals(Complex* fft, Complex* invfft, long dataSize) noexcept;
+
+void addjustCoefficientMagnitude(Complex* h_data, long dataSize) noexcept
+{
+
+    if (h_data) {
+        for (long i = 0; i < dataSize; ++i) {
+            h_data[i] = { h_data[i].real() / 8.0f / dataSize, 0 };
+        }
+    }
+}
+
+int isOriginalEqualToTheTransformedAndInverseTransformenData(
+    const Complex* original, const Complex* transformed, long dataSize) noexcept
+{
+    int iTestResult = 1;
+    if (original && transformed) {
+        iTestResult = 0;
+        for (int i = 0; i < dataSize; ++i) {
+            if (std::abs(transformed[i].real() - original[i].real()) > abs(original[i].real() * 1e-4f))
+                iTestResult += 1;
+        }
+    }
+    return iTestResult;
+}
+
+void printTheData(const Complex* original, const Complex* transformed, long dataSize)
+{
+    std::cout << "The first " << dataSize << " real values:" << std::endl;
+    if (original) {
+        for (int i = 0; i < dataSize; ++i) {
+            std::cout << original[i].real() << " ";
+        }
+        std::cout << std::endl;
+    }
+    if (transformed) {
+        for (int i = 0; i < dataSize; ++i) {
+            std::cout << transformed[i].real() << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+void initializeTheSignals(Complex* fft, Complex* invfft, long dataSize) noexcept
+{
+    for (long i = 0; i < dataSize; ++i) {
+        if(fft)
+            fft[i] = { rand() / static_cast<float>(RAND_MAX), 0 };
+        if(invfft)
+            invfft[i] = { float(i), 1000.f * i };
+    }
+}
 
 using namespace testing;
 
@@ -75,57 +134,6 @@ TEST(vector, data) {
     EXPECT_EQ(12345,utReadOnly[1]);
 }
 
-TEST(rescale, theKernelFunction)
-{
-    const unsigned short input[8]{1,2,3,4,5,6,7,8};
-    float output[5]{};
-    const float fractionalSamples[4]{1,2,3,4};
-    const float wholeSamples[4]{1,2,3,4};
-    const unsigned int inputLength{1};
-    const unsigned int outputLength{1};
-
-    EXPECT_EQ(0,output[2]);
-
-    RescaleKernel::theFunction( input, output,
-                                fractionalSamples,
-                                wholeSamples,
-                                inputLength,
-                                outputLength);
-    EXPECT_EQ(6,output[2]);
-}
-
-TEST(cudRescale, parameters)
-{
-    char buffer[80]{};
-    char* errorMsg{buffer};
-    unsigned short data[8]{1,2,3,4,5,6,7,8};
-    float wholeSample[2]{};
-    float output[8]{};
-
-    bool success = cudaRescale(output,nullptr,0,nullptr,nullptr,errorMsg);
-    EXPECT_FALSE(success);
-    if(!success){
-        EXPECT_STREQ("Invalid arguments",errorMsg);
-    }
-
-    success = cudaRescale(output,data,8,nullptr,nullptr,errorMsg);
-    EXPECT_FALSE(success);
-    if(!success){
-        EXPECT_STREQ("Invalid arguments",errorMsg);
-    }
-
-    success = cudaRescale(output,data,8,wholeSample,nullptr,errorMsg);
-    EXPECT_FALSE(success);
-    if(!success){
-        EXPECT_STREQ("Invalid arguments",errorMsg);
-    }
-    success = cudaRescale(output,data,8,nullptr,wholeSample,errorMsg);
-    EXPECT_FALSE(success);
-    if(!success){
-        EXPECT_STREQ("Invalid arguments",errorMsg);
-    }
-}
-
 TEST(cuda, matrix4by4Add)
 {
     int A[4][4];
@@ -159,28 +167,30 @@ TEST(cuda, matrix4by4Add)
 
 }
 
-TEST(cudaRescale, memoryAllocation)
+
+TEST(cudaFFT, computeTheFFT)
 {
-    char buffer[80]{};
-    char* errorMsg{buffer};
+    constexpr long SIGNAL_SIZE(1024);
 
-//    const size_t sizeOfData{5758976/2};
-//    const size_t sizeOfTable{2048};
-    const size_t sizeOfData{1024};
-    const size_t sizeOfTable{1024};
+    // Allocate host memory for the signal
+    auto h_signal = std::make_unique<std::complex<float>[]>(SIGNAL_SIZE);
+    auto h_signal_fft_ifft = std::make_unique<std::complex<float>[]>(SIGNAL_SIZE);
 
-    unsigned short data[sizeOfData]{1};
-    float fracSamples[sizeOfTable]{1};
-    float wholeSamples[sizeOfTable]{1};
-    float output[sizeOfData]{};
+    initializeTheSignals(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE);
 
-    bool success = cudaRescale(output,data,sizeOfData,wholeSamples,fracSamples,errorMsg);
-    EXPECT_TRUE(success);
-    if(success){
-        EXPECT_EQ(0,buffer[0]);
-    } else {
-        qDebug() << "{!!!!!!!!!!] " << QString(errorMsg);
-    }
+    ComputeTheFFT(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE);
+
+    // check result
+    int iTestResult = 1;
+
+    //result scaling
+    addjustCoefficientMagnitude(h_signal_fft_ifft.get(), SIGNAL_SIZE);
+
+    iTestResult = isOriginalEqualToTheTransformedAndInverseTransformenData(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE);
+
+    printTheData(h_signal.get(), h_signal_fft_ifft.get(), 10);
+
+    EXPECT_EQ(0, iTestResult);
 }
 
 #endif // TESTSAMPLECODE_H

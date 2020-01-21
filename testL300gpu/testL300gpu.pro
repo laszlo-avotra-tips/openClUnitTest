@@ -4,20 +4,19 @@ include(openCl_dependency.pri)
 
 
 TEMPLATE = app
-CONFIG += console c++14
+CONFIG += console
+CONFIG += c++17
 CONFIG -= app_bundle
 CONFIG += thread
 
 QT += core
 
 HEADERS += \
-    rescalekernel.h \
     testL300GpuCode.h \
     vectoraddtestvector.h
 
 SOURCES += \
         main.cpp \
-        rescalekernel.cpp \
         vectoraddtestvector.cpp
 
 DISTFILES +=
