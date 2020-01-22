@@ -12,65 +12,61 @@
 #include <complex>
 
 
-using Complex = std::complex<float>;
-void addjustCoefficientMagnitude(Complex* h_data, long dataSize) noexcept;
-int isOriginalEqualToTheTransformedAndInverseTransformenData(
-    const Complex* original, const Complex* transformed, long dataSize) noexcept;
-void printTheData(const Complex* original, const Complex* transformed, long dataSize, const int printOffset);
-void initializeTheSignals(Complex* fft, Complex* invfft, long dataSize) noexcept;
+//using Complex = std::complex<float>;
+//void addjustCoefficientMagnitude(Complex* h_data, long dataSize) noexcept;
+//int isOriginalEqualToTheTransformedAndInverseTransformenData(
+//    const Complex* original, const Complex* transformed, long dataSize) noexcept;
+//void printTheData(const Complex* original, const Complex* transformed, long dataSize, const int printOffset);
+//void initializeTheSignals(Complex* fft, long dataSize) noexcept;
 
-void addjustCoefficientMagnitude(Complex* h_data, long dataSize) noexcept
-{
+//void addjustCoefficientMagnitude(Complex* h_data, long dataSize) noexcept
+//{
+//    if (h_data) {
+//        for (long i = 0; i < dataSize; ++i) {
+//            h_data[i] = { h_data[i].real() / 8.0f / dataSize, 0 };
+//        }
+//    }
+//}
 
-    if (h_data) {
-        for (long i = 0; i < dataSize; ++i) {
-            h_data[i] = { h_data[i].real() / 8.0f / dataSize, 0 };
-        }
-    }
-}
+//int isOriginalEqualToTheTransformedAndInverseTransformenData(
+//    const Complex* original, const Complex* transformed, long dataSize) noexcept
+//{
+//    int iTestResult = 0;
+//    if (original && transformed) {
+//        iTestResult = 0;
+//        for (int i = 0; i < dataSize; ++i) {
+//            if (std::abs(transformed[i].real() - original[i].real()) > abs(original[i].real() * 1e-4f))
+//                iTestResult += 1;
+//        }
+//    }
+//    return iTestResult;
+//}
 
-int isOriginalEqualToTheTransformedAndInverseTransformenData(
-    const Complex* original, const Complex* transformed, long dataSize) noexcept
-{
-    int iTestResult = 1;
-    if (original && transformed) {
-        iTestResult = 0;
-        for (int i = 0; i < dataSize; ++i) {
-            if (std::abs(transformed[i].real() - original[i].real()) > abs(original[i].real() * 1e-4f))
-                iTestResult += 1;
-        }
-    }
-    return iTestResult;
-}
+//void printTheData(const Complex* original, const Complex* transformed, long dataSize, const int printOffset)
+//{
+//    std::cout << "The first " << dataSize << " real values with offset [" << printOffset << "] :" << std::endl;
+//    if (original) {
+//        for (int i = 0; i < dataSize; ++i) {
+//            std::cout << original[i + printOffset].real() << " ";
+//        }
+//        std::cout << std::endl;
+//    }
+//    if (transformed) {
+//        for (int i = 0; i < dataSize; ++i) {
+//            std::cout << transformed[i + printOffset].real() << " ";
+//        }
+//        std::cout << std::endl;
+//    }
+//}
 
-void printTheData(const Complex* original, const Complex* transformed, long dataSize, const int printOffset)
-{
-    std::cout << "The first " << dataSize << " real values with offset [" << printOffset << "] :" << std::endl;
-    if (original) {
-        for (int i = 0; i < dataSize; ++i) {
-            std::cout << original[i + printOffset].real() << " ";
-        }
-        std::cout << std::endl;
-    }
-    if (transformed) {
-        for (int i = 0; i < dataSize; ++i) {
-            std::cout << transformed[i + printOffset].real() << " ";
-        }
-        std::cout << std::endl;
-    }
-}
-
-void initializeTheSignals(Complex* fft, Complex* invfft, long dataSize) noexcept
-{
-      for (long i = 0; i < dataSize; ++i) {
-        if(fft){
-            fft[i] = { rand() / static_cast<float>(RAND_MAX), 0 };
-        }
-        if(invfft){
-            invfft[i] = { 0.1f };
-        }
-    }
-}
+//void initializeTheSignals(Complex* fft, long dataSize) noexcept
+//{
+//      for (long i = 0; i < dataSize; ++i) {
+//        if(fft){
+//            fft[i] = { rand() / static_cast<float>(RAND_MAX), 0 };
+//        }
+//    }
+//}
 
 using namespace testing;
 
@@ -179,7 +175,7 @@ TEST(cudaFFT, computeTheFFT)
     auto h_signal = std::make_unique<std::complex<float>[]>(SIGNAL_SIZE);
     auto h_signal_fft_ifft = std::make_unique<std::complex<float>[]>(SIGNAL_SIZE);
 
-    initializeTheSignals(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE);
+    initializeTheSignals(h_signal.get(), SIGNAL_SIZE);
 
 
     ComputeTheFFT(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE, batch);
@@ -193,6 +189,36 @@ TEST(cudaFFT, computeTheFFT)
     iTestResult = isOriginalEqualToTheTransformedAndInverseTransformenData(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE);
 
     printTheData(h_signal.get(), h_signal_fft_ifft.get(), 8, 0);
+
+    EXPECT_EQ(0, iTestResult);
+}
+
+TEST(cudaFFT, computeTheFFT2)
+{
+    constexpr long SIGNAL_SIZE(1024);
+    constexpr int batch{4};
+
+    // Allocate host memory for the signal
+    auto h_signal = std::make_unique<std::complex<float>[]>(SIGNAL_SIZE);
+    auto h_signal_fft_ifft = std::make_unique<std::complex<float>[]>(SIGNAL_SIZE);
+
+    auto h_signal_pointer = h_signal.get();
+    auto h_signal_fft_ifft_pointer = nullptr;//h_signal_fft_ifft.get();
+
+    initializeTheSignals(h_signal_pointer, SIGNAL_SIZE);
+
+
+    ComputeTheFFT(h_signal_pointer, h_signal_fft_ifft_pointer, SIGNAL_SIZE, batch);
+
+    // check result
+    int iTestResult = 1;
+
+    //result scaling
+    addjustCoefficientMagnitude(h_signal_fft_ifft_pointer, SIGNAL_SIZE);
+
+    iTestResult = isOriginalEqualToTheTransformedAndInverseTransformenData(h_signal_pointer, h_signal_fft_ifft_pointer, SIGNAL_SIZE);
+
+    printTheData(h_signal_pointer, h_signal_fft_ifft_pointer, 8, 0);
 
     EXPECT_EQ(0, iTestResult);
 }
