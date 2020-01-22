@@ -12,62 +12,6 @@
 #include <complex>
 
 
-//using Complex = std::complex<float>;
-//void addjustCoefficientMagnitude(Complex* h_data, long dataSize) noexcept;
-//int isOriginalEqualToTheTransformedAndInverseTransformenData(
-//    const Complex* original, const Complex* transformed, long dataSize) noexcept;
-//void printTheData(const Complex* original, const Complex* transformed, long dataSize, const int printOffset);
-//void initializeTheSignals(Complex* fft, long dataSize) noexcept;
-
-//void addjustCoefficientMagnitude(Complex* h_data, long dataSize) noexcept
-//{
-//    if (h_data) {
-//        for (long i = 0; i < dataSize; ++i) {
-//            h_data[i] = { h_data[i].real() / 8.0f / dataSize, 0 };
-//        }
-//    }
-//}
-
-//int isOriginalEqualToTheTransformedAndInverseTransformenData(
-//    const Complex* original, const Complex* transformed, long dataSize) noexcept
-//{
-//    int iTestResult = 0;
-//    if (original && transformed) {
-//        iTestResult = 0;
-//        for (int i = 0; i < dataSize; ++i) {
-//            if (std::abs(transformed[i].real() - original[i].real()) > abs(original[i].real() * 1e-4f))
-//                iTestResult += 1;
-//        }
-//    }
-//    return iTestResult;
-//}
-
-//void printTheData(const Complex* original, const Complex* transformed, long dataSize, const int printOffset)
-//{
-//    std::cout << "The first " << dataSize << " real values with offset [" << printOffset << "] :" << std::endl;
-//    if (original) {
-//        for (int i = 0; i < dataSize; ++i) {
-//            std::cout << original[i + printOffset].real() << " ";
-//        }
-//        std::cout << std::endl;
-//    }
-//    if (transformed) {
-//        for (int i = 0; i < dataSize; ++i) {
-//            std::cout << transformed[i + printOffset].real() << " ";
-//        }
-//        std::cout << std::endl;
-//    }
-//}
-
-//void initializeTheSignals(Complex* fft, long dataSize) noexcept
-//{
-//      for (long i = 0; i < dataSize; ++i) {
-//        if(fft){
-//            fft[i] = { rand() / static_cast<float>(RAND_MAX), 0 };
-//        }
-//    }
-//}
-
 using namespace testing;
 
 TEST(unitTest, case1)
