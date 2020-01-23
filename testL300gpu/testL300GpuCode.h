@@ -111,8 +111,8 @@ TEST(cuda, matrix4by4Add)
 
 TEST(cudaFFT, computeTheFFT)
 {
-    constexpr int fftSize{2048};
-    constexpr int batchSize{160};
+    constexpr size_t fftSize{2048};
+    constexpr size_t batchSize{16};
     constexpr long dataSize(fftSize * batchSize);
 
     // Allocate host memory for the signal
@@ -122,49 +122,42 @@ TEST(cudaFFT, computeTheFFT)
     initializeTheSignals(h_signal.get(), dataSize);
 
 
-    ComputeTheFFT(h_signal.get(),nullptr, dataSize, batchSize);
+    ComputeTheFFT(h_signal.get(), h_signal_fft_ifft.get(), fftSize, batchSize);
 
     // check result
     int iTestResult = 0;
 
     //result scaling
-//    addjustCoefficientMagnitude(h_signal_fft_ifft.get(), SIGNAL_SIZE);
+    addjustCoefficientMagnitude(h_signal_fft_ifft.get(), dataSize);
 
-//    iTestResult = isOriginalEqualToTheTransformedAndInverseTransformenData(h_signal.get(), h_signal_fft_ifft.get(), SIGNAL_SIZE);
+    iTestResult = isOriginalEqualToTheTransformedAndInverseTransformenData(h_signal.get(), h_signal_fft_ifft.get(), dataSize);
 
     printTheData(h_signal.get(), nullptr, 8, dataSize - 9);
 
     EXPECT_EQ(0, iTestResult);
 }
 
-//TEST(cudaFFT, computeTheFFT2)
-//{
-//    constexpr long SIGNAL_SIZE(1024);
-//    constexpr int batch{4};
+TEST(cudaFFT, computeTheFFT2)
+{
+    constexpr size_t fftSize{2048};
+    constexpr size_t batchSize{144};
+    constexpr long dataSize(fftSize * batchSize);
 
-//    // Allocate host memory for the signal
-//    auto h_signal = std::make_unique<std::complex<float>[]>(SIGNAL_SIZE);
-//    auto h_signal_fft_ifft = std::make_unique<std::complex<float>[]>(SIGNAL_SIZE);
+    // Allocate host memory for the signal
+    auto h_signal = std::make_unique<std::complex<float>[]>(dataSize);
 
-//    auto h_signal_pointer = h_signal.get();
-//    auto h_signal_fft_ifft_pointer = nullptr;//h_signal_fft_ifft.get();
-
-//    initializeTheSignals(h_signal_pointer, SIGNAL_SIZE);
+    initializeTheSignals(h_signal.get(), dataSize);
 
 
-//    ComputeTheFFT(h_signal_pointer, h_signal_fft_ifft_pointer, SIGNAL_SIZE, batch);
+    ComputeTheFFT(h_signal.get(), nullptr, fftSize, batchSize);
 
-//    // check result
-//    int iTestResult = 1;
+    // check result
+    int iTestResult = 0;
 
-//    //result scaling
-//    addjustCoefficientMagnitude(h_signal_fft_ifft_pointer, SIGNAL_SIZE);
+    printTheData(h_signal.get(), nullptr, 8, dataSize - 9);
 
-//    iTestResult = isOriginalEqualToTheTransformedAndInverseTransformenData(h_signal_pointer, h_signal_fft_ifft_pointer, SIGNAL_SIZE);
+    EXPECT_EQ(0, iTestResult);
+}
 
-//    printTheData(h_signal_pointer, h_signal_fft_ifft_pointer, 8, 0);
-
-//    EXPECT_EQ(0, iTestResult);
-//}
 
 #endif // TESTSAMPLECODE_H
