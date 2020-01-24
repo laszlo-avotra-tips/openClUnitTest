@@ -10,6 +10,7 @@
 #include <QTime>
 #include <cudaFFTwrapper.h>
 #include <complex>
+#include <iostream>
 
 
 using namespace testing;
@@ -112,27 +113,24 @@ TEST(cuda, matrix4by4Add)
 TEST(cudaFFT, computeTheFFT)
 {
     constexpr size_t fftSize{2048};
-    constexpr size_t batchSize{16};
-    constexpr long dataSize(fftSize * batchSize);
+    constexpr size_t batchSize{592};
+    constexpr size_t dataSize(fftSize * batchSize);
 
     // Allocate host memory for the signal
-    auto h_signal = std::make_unique<std::complex<float>[]>(dataSize);
-    auto h_signal_fft_ifft = std::make_unique<std::complex<float>[]>(dataSize);
+    auto h_signalIn = std::make_unique<std::complex<float>[]>(dataSize);
+    auto h_signalOut = std::make_unique<std::complex<float>[]>(dataSize);
 
-    initializeTheSignals(h_signal.get(), dataSize);
+    initializeTheSignals(h_signalIn.get(), dataSize);
 
-
-    ComputeTheFFT(h_signal.get(), h_signal_fft_ifft.get(), fftSize, batchSize);
+    ComputeTheFFT(h_signalOut.get(), h_signalIn.get(), fftSize, batchSize);
 
     // check result
     int iTestResult = 0;
 
     //result scaling
-    addjustCoefficientMagnitude(h_signal_fft_ifft.get(), dataSize);
+//    addjustCoefficientMagnitude(h_signalOut.get(), dataSize);
 
-    iTestResult = isOriginalEqualToTheTransformedAndInverseTransformenData(h_signal.get(), h_signal_fft_ifft.get(), dataSize);
-
-    printTheData(h_signal.get(), nullptr, 8, dataSize - 9);
+    printTheData(h_signalIn.get(), h_signalOut.get(), 8, dataSize - 9);
 
     EXPECT_EQ(0, iTestResult);
 }
@@ -140,21 +138,40 @@ TEST(cudaFFT, computeTheFFT)
 TEST(cudaFFT, computeTheFFT2)
 {
     constexpr size_t fftSize{2048};
-    constexpr size_t batchSize{144};
-    constexpr long dataSize(fftSize * batchSize);
+    constexpr size_t batchSize{592};
+    constexpr size_t dataSize(fftSize * batchSize);
+
+    float maxIn{0.0f};
+    float maxOut{0.0};
 
     // Allocate host memory for the signal
-    auto h_signal = std::make_unique<std::complex<float>[]>(dataSize);
+    auto h_signalIn = std::make_unique<std::complex<float>[]>(dataSize);
+    auto h_signalOut = std::make_unique<std::complex<float>[]>(dataSize);
 
-    initializeTheSignals(h_signal.get(), dataSize);
+    initializeTheSignals(h_signalIn.get(), dataSize);
 
-
-    ComputeTheFFT(h_signal.get(), nullptr, fftSize, batchSize);
+    ComputeTheFFT(h_signalOut.get(), h_signalIn.get(), fftSize, batchSize);
 
     // check result
     int iTestResult = 0;
 
-    printTheData(h_signal.get(), nullptr, 8, dataSize - 9);
+    //result scaling
+    addjustCoefficientMagnitude(h_signalOut.get(), dataSize);
+
+    printTheData(h_signalIn.get(), h_signalOut.get(), 8, dataSize - 9);
+
+    auto pIn = h_signalIn.get();
+    auto pOut = h_signalOut.get();
+    for(size_t i = 0; i < dataSize; ++i){
+        auto tempIn = pIn[i].real();
+        auto tempOut = pOut[i].real();
+        maxIn = std::max<float>(maxIn, tempIn);
+        maxOut = std::max<float>(maxOut, tempOut);
+    }
+    if(maxIn > 0.0f ){
+        qDebug() << "[..........] " << "max Real in = " << maxIn << ", max Real out = " << maxOut << " k = " << maxOut / maxIn;
+    }
+
 
     EXPECT_EQ(0, iTestResult);
 }
